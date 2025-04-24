@@ -14,6 +14,7 @@ nodeGroups:
     maxSize: 2
     volumeSize: 8
     ami: ami-0e35ddab05955cf57 (64-bit (x86))
+    amiFamily: AmazonLinux2
     securityGroups:
       attachIDs: ["sg-0058cdbd9a12fb67e"] 
     ssh:
