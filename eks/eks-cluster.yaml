@@ -1,0 +1,26 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: Finacplus_cluster
+  region: us-west-2
+  version: "1.29"
+
+nodeGroups:
+  - name: default-workers
+    instanceType: t2.mirco
+    desiredCapacity: 2
+    minSize: 2
+    maxSize: 2
+    volumeSize: 8
+    ami: ami-0e35ddab05955cf57 (64-bit (x86))
+    securityGroups:
+      attachIDs: ["sg-0058cdbd9a12fb67e"] 
+    ssh:
+      allow: true
+      publicKeyName: devopspatial  # Replace with your EC2 key pair name
+    labels:
+      role: worker
+    tags:
+      nodegroup-role: worker
+    
