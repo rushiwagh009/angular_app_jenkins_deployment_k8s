@@ -2,8 +2,8 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
-  name: Finacplus_cluster
-  region: us-west-2
+  name: my-cluster-finacplus
+  region: ap-south-1
   version: "1.29"
 
 nodeGroups:
@@ -13,16 +13,11 @@ nodeGroups:
     minSize: 2
     maxSize: 2
     volumeSize: 8
-    ami: ami-0e35ddab05955cf57 (64-bit (x86))
+    ami: ami-0e35ddab05955cf57
     amiFamily: AmazonLinux2
     overrideBootstrapCommand: |
       #!/bin/bash
       /etc/eks/bootstrap.sh Finacplus_cluster
-    securityGroups:
-      attachIDs: ["sg-0058cdbd9a12fb67e"] 
-    ssh:
-      allow: true
-      publicKeyName: devopspatial  # Replace with your EC2 key pair name
     labels:
       role: worker
     tags:
