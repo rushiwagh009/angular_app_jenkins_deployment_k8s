@@ -1,0 +1,60 @@
+pipeline 
+{
+   agent none 
+    stages 
+    {
+        stage('Checkout Code') 
+        {
+            agent { label 'maven_node' }
+            steps 
+            {
+                git 'https://github.com/rushiwagh009/angular_app_jenkins_deployment_k8s.git'
+            }
+        }
+        stage('Build with Maven') 
+        {    
+            agent { label 'maven_node' }
+            steps 
+            {
+                sh '''
+                mvn clean install
+                '''
+                stash includes: '**/target/**, Dockerfile,**/eks/**', name: 'build-artifacts'
+            }
+        }
+        stage ('docker image build')
+        {
+            agent {label 'aws_node'}
+            environment 
+            {
+                ECR_REGISTRY = '861276087074.dkr.ecr.ap-south-1.amazonaws.com'
+                ECR_REPO = 'finacplus/javaapp'
+                IMAGE_NAME = 'javaapp'
+                AWS_REGION = 'ap-south-1'
+            }
+            steps
+            {
+                unstash 'build-artifacts'
+                sh '''
+                aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}
+                docker build -t $ECR_REPO .
+                docker tag ${ECR_REPO}:latest ${ECR_REGISTRY}/${ECR_REPO}:latest
+                docker push ${ECR_REGISTRY}/${ECR_REPO}:latest
+                '''
+            }
+        }
+        stage('Deploy to EKS') 
+        {
+            agent { label 'aws_node' }
+            
+            steps 
+            {
+                sh '''
+                    aws eks update-kubeconfig --region ap-south-1 --name my-cluster-finacplus
+                    kubectl apply -f eks/deployment.yaml
+                    kubectl apply -f eks/service.yaml
+                '''
+            }
+        }
+    }
+}
